@@ -1,0 +1,25 @@
+{
+    "name": "reginaldoas/nfse",
+    "description": "Pacote para geração de nfse pelo emissor nacional",
+    "type": "php",
+    "require": {
+        "php": "^8.2",
+        "ext-dom": "*",
+        "ext-curl": "*",
+        "ext-zlib": "*",
+        "ext-openssl": "*"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Reginaldoas\\Nfse\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Reginaldo Souza",
+            "email": "reginaldo_as@hotmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
