@@ -1,6 +1,10 @@
 {
     "name": "reginaldoas/nfse",
     "description": "Pacote para geração de nfse pelo emissor nacional",
+    "keywords": [
+        "nfse-nacional",
+        "nfse"
+    ],
     "type": "php",
     "require": {
         "php": "^8.2",
@@ -21,5 +25,9 @@
             "email": "reginaldo_as@hotmail.com"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "dev",
+    "config": {
+        "optimize-autoloader": true
+    },
+    "prefer-stable": true
 }
