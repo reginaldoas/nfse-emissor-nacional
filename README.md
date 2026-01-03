@@ -9,7 +9,7 @@ Link para documentação original https://www.gov.br/nfse/pt-br/biblioteca/docum
 **Pacote desenvolvido para uso do [Composer](https://getcomposer.org/)**
 
 ```bash
-composer require reginaldoas/nfse-emissor-nacional
+composer require reginaldoas/nfse
 ```
 
 
