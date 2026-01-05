@@ -9,6 +9,11 @@ use Reginaldoas\Nfse\Common\Certificate;
 class Nfse extends NfseAbstract implements NfseInterface
 {
 
+    public function render(){
+        $dps = new Dps($this->std);
+        $content = $dps->render();
+    }
+
     public function inclusaoNfse()
     {
         $dps = new Dps($this->std);

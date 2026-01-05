@@ -1318,13 +1318,7 @@ abstract class DpsAbstract{
                 $this->std->infpedreg->chnfse,
                 true
             );
-            $this->dom->addChild(
-                $infpedreg_inner,
-                'nPedRegEvento',
-                $this->std->npedregevento,
-                true
-            );
-
+            
             if (isset($this->std->infpedreg->e101101)) {
                 $e101101_inner = $this->dom->createElement('e101101');
                 $infpedreg_inner->appendChild($e101101_inner);
@@ -1437,9 +1431,8 @@ abstract class DpsAbstract{
     private function generatePre()
     {
         $string = 'PRE';
-        $string .= $this->std->infpedreg->chnfse; //Chave de acesso da nfse
-        $string .= $this->getCodigoEvento(); //codigo do evento
-        $string .= $this->tools->increment($this->std->npedregevento, 3); //numero do pedido de registro do evento
+        $string .= $this->std->infpedreg->chnfse; //Chave de acesso da NFS-e (50) +
+        $string .= $this->getCodigoEvento(); //Código do evento (6)
         $this->preId = $string;
         return $string;
     }

@@ -3,6 +3,7 @@
 namespace Reginaldoas\Nfse;
 
 interface NfseInterface{
+    public function render();
     public function inclusaoNfse();
     public function consultaDanfe();
     public function consultaNfseChave();
