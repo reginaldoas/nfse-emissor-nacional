@@ -12,6 +12,23 @@ class Nfse extends NfseAbstract implements NfseInterface
     public function render(){
         $dps = new Dps($this->std);
         $content = $dps->render();
+        $this->dps_id = $dps->getDpsId();
+        return $content;
+    }
+
+    public function getDpsId(){
+        return $this->dps_id;
+    }
+
+    public function renderEvento(){
+        $dps = new Dps($this->std);
+        $content = $dps->renderEvento();
+        $this->event_id = $dps->getEventoId();
+        return $content;
+    }
+
+    public function getEventoId(){
+        return $this->event_id;
     }
 
     public function inclusaoNfse()
@@ -23,9 +40,9 @@ class Nfse extends NfseAbstract implements NfseInterface
         $content = '<?xml version="1.0" encoding="UTF-8"?>' . $content;
         $gz = gzencode($content);
         $data = base64_encode($gz);
-        file_put_contents(dirname(__DIR__) . "/certs/nfse.xml",$content);
-        file_put_contents(dirname(__DIR__) . "/certs/arquivo.gzip",$gz);
-        file_put_contents(dirname(__DIR__) . "/certs/encode.txt",$data);
+        // file_put_contents(dirname(__DIR__) . "/certs/nfse.xml",$content);
+        // file_put_contents(dirname(__DIR__) . "/certs/arquivo.gzip",$gz);
+        // file_put_contents(dirname(__DIR__) . "/certs/encode.txt",$data);
 
         $data_encode = [
             'dpsXmlGZipB64' => $data

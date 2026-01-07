@@ -27,6 +27,14 @@ abstract class NfseAbstract{
      * @var boolean
      */
     public $production = false;
+    /**
+     * @var string
+     */
+    public $dps_id = '';
+    /**
+     * @var string
+     */
+    public $event_id = '';
 
     public function __construct($std, $cert, $cert_pass, $production){
         $this->std = $std;
