@@ -54,8 +54,18 @@ class Nfse extends NfseAbstract implements NfseInterface
     public function consultaDanfe()
     {
         $callback = 'danfse/' . $this->std->chave_acesso;
-        $response = $this->sender->request($callback, null, "GET", 2);
-        return $response;
+
+        $verify_status = $this->sender->verifyStatus($callback);
+        if($verify_status){
+            // service danfse active
+            $response = $this->sender->request($callback, null, "GET", 2);
+            return $response;
+        }else{
+            // using scraping
+            $response = $this->sender->scraptDanfe($this->std->chave_acesso);
+            return $response;
+        }
+
     }
 
     public function consultaNfseChave()

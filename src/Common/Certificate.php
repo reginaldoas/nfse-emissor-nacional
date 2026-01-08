@@ -145,7 +145,7 @@ class Certificate implements CertificateInterface{
         }
     }
 
-    protected function isExpired(){
+    public function isExpired(){
         return strtotime($this->_data_cert->valid_to) < strtotime(date('Y-m-d')) ? true : false;
     }
 

@@ -31,6 +31,29 @@ class Sender{
         $this->cert = $cert;
     }
 
+    public function verifyStatus($callback, $origin = 2) {
+
+        $this->resolveUrl($origin);
+        $url_api = $this->url_api . $callback;
+
+        $ch = curl_init($url_api);
+        
+        curl_setopt($ch, CURLOPT_NOBODY, true); // Only headers
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        //certificate
+        curl_setopt($ch, CURLOPT_SSLCERTTYPE, "P12");
+        curl_setopt($ch, CURLOPT_SSLCERT, $this->cert->getPathCert() . 'cert.pfx');
+        curl_setopt($ch, CURLOPT_SSLCERTPASSWD, $this->cert->getPass());
+        curl_exec($ch);
+        
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        return ($httpCode >= 200 && $httpCode < 300);
+    }
+
     public function request($callback, $data, $method = 'POST',$origin = 1)
     {
 
@@ -62,9 +85,7 @@ class Sender{
         curl_setopt($ch, CURLOPT_SSLCERTPASSWD, $this->cert->getPass());
         
         #Envia a requisição e verifica o retorno
-        $return = true;
         if (($result = curl_exec($ch)) === FALSE) {
-            $return = false;
             $data_return = ['error' => true, 'result' => curl_error($ch),'pdf' => false];
         }else{
             $headsize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
@@ -81,51 +102,110 @@ class Sender{
 
     }
 
-    /*
-    public function request($callback, $data, Certificate $cert, $origin = 1, $method = "POST", $debug = false)
+    private function scrapAuth()
     {
 
-        $this->resolveUrl($origin);
+        $url_api = "https://www.nfse.gov.br/EmissorNacional/Certificado";
 
-        $msgSize = $data ? strlen($data) : 0;
+        $path = dirname(__DIR__).'/TESTES/novo_certificado.pfx';
 
-        $options = array();
-        $options['debug'] = $debug;
-        $options['verify'] = false;
-        $options['timeout'] = 300;
-        $options['connect_timeout'] = 300;
-        $options['allow_redirects'] = false;
-        $options['http_errors'] = true;
-        $options['headers'] = [
-            'Content-Type' => 'application/json',
-            'Content-length: ' . $msgSize,
-        ];
-        if(!empty($data)){
-            $options['json'] = $data;
+        // $fp = fopen(dirname(__FILE__).'/errorlog.txt', 'w');
+
+        $headers = array(
+            "User-Agent: Sistema/v1.0"
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url_api);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_ENCODING, '');
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+        // curl_setopt($ch, CURLOPT_VERBOSE, true);
+        // curl_setopt($ch, CURLOPT_STDERR, $fp);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        //certificate
+        curl_setopt($ch, CURLOPT_SSLCERTTYPE, "P12");
+        curl_setopt($ch, CURLOPT_SSLCERT, $this->cert->getPathCert() . 'cert.pfx');
+        curl_setopt($ch, CURLOPT_SSLCERTPASSWD, $this->cert->getPass());
+
+        $result = curl_exec($ch);
+
+        $headsize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $header = substr($result, 0, $headsize);
+        $body = substr($result, $headsize);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        $new_cookie = '';
+        if($httpCode == 200 && !empty($header)){
+            // Extract Cookies
+            preg_match_all('/Set-Cookie:\s*([^;]*)/mi', $header, $matches);
+            
+            $list_cookies = [];
+            foreach($matches[1] as $item) {
+                $list_cookies[] = $item;
+            }
+            if(count($list_cookies) > 0){
+                $new_cookie = implode("; ",$list_cookies);
+            }
+
         }
 
-        $client = new Client([
-            'base_uri' => $this->url_api,
-            'cert' => [$cert->getPathCert() . 'cert.pem', $cert->getPass()]
-        ]);
-        $promise = $client->requestAsync($method, $callback, $options);
-        $promise->then(function (ResponseInterface $response) {
-            $contentType = $response->getHeaderLine('Content-Type');
-            $body = $contentType == "application/pdf" ? $response->getBody() : json_decode($response->getBody(),true);
-            return ['error' => false, 'body' => $body];
-        });
-
-        try{
-            return $promise->wait();
-        }catch(RequestException $e){
-            $response = $e->getResponse();
-            $responseBodyAsString = $response->getBody()->getContents();
-            return ['error' => true, 'body' => $responseBodyAsString];
-        }
+        return $new_cookie;
 
     }
-    */
 
+    private function scrapFile($chave_acesso,$cookie)
+    {
+
+        $url_api = "https://www.nfse.gov.br/EmissorNacional/Notas/Download/DANFSe/" . $chave_acesso;
+
+        $headers = array(
+            "Content-Type: application/json",
+            "Cookie: {$cookie}"
+        );
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url_api);
+        curl_setopt($ch, CURLOPT_REFERER, $url_api);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        if (($result = curl_exec($ch)) === FALSE) {
+            $data_return = '';
+            $data_return = ['error' => true, 'result' => curl_error($ch),'pdf' => false];
+        }else{
+            $headsize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+            $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+            $data_body = $contentType == 'application/pdf' ? $result : '';
+            $pdf = $contentType == 'application/pdf' ? true : false;
+            $data_return = ['error' => false, 'result' => $data_body,'pdf' => $pdf];
+        }
+
+        curl_close($ch);
+
+        return $data_return;
+
+    }
+
+    public function scraptDanfe($chave_acesso)
+    {
+        $cookie = $this->scrapAuth();
+        $file_content = '';
+        if(!empty($cookie)){
+            $file_content = $this->scrapFile($chave_acesso, $cookie);
+        }
+        return $file_content;
+    }
+    
     private function resolveUrl(int $origin = 0)
     {
         switch ($origin) {
