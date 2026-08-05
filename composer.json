@@ -11,7 +11,9 @@
         "ext-dom": "*",
         "ext-curl": "*",
         "ext-zlib": "*",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "tecnickcom/tc-lib-barcode": "^2.12",
+        "setasign/fpdf": "^1.9"
     },
     "license": "MIT",
     "autoload": {

@@ -9,6 +9,7 @@ interface NfseInterface{
     public function getEventoId();
     public function inclusaoNfse();
     public function consultaDanfe();
+    public function renderDanfe(?string $logo = null);
     public function consultaNfseChave();
     public function consultaDpsChave();
     public function consultaNfseEventos();

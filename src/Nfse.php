@@ -3,6 +3,7 @@
 namespace Reginaldoas\Nfse;
 
 use Reginaldoas\Nfse\Common\Dps;
+use Reginaldoas\Nfse\Common\Danfe;
 use Reginaldoas\Nfse\Common\Sender;
 use Reginaldoas\Nfse\Common\Certificate;
 
@@ -40,9 +41,6 @@ class Nfse extends NfseAbstract implements NfseInterface
         $content = '<?xml version="1.0" encoding="UTF-8"?>' . $content;
         $gz = gzencode($content);
         $data = base64_encode($gz);
-        // file_put_contents(dirname(__DIR__) . "/certs/nfse.xml",$content);
-        // file_put_contents(dirname(__DIR__) . "/certs/arquivo.gzip",$gz);
-        // file_put_contents(dirname(__DIR__) . "/certs/encode.txt",$data);
 
         $data_encode = [
             'dpsXmlGZipB64' => $data
@@ -51,6 +49,11 @@ class Nfse extends NfseAbstract implements NfseInterface
         return $response;
     }
 
+    /*
+    * Consulta o Danfe da NFSe
+    * Serviço inativo desde 01/06/2026
+    * @return string
+    */
     public function consultaDanfe()
     {
         $callback = 'danfse/' . $this->std->chave_acesso;
@@ -68,18 +71,35 @@ class Nfse extends NfseAbstract implements NfseInterface
 
     }
 
+    /*
+    * Renderiza o Danfe da NFSe localmente (sem API).
+    * Informe o XML autorizado em $std->xml.
+    * @return string Conteúdo binário do PDF
+    */
+    public function renderDanfe(?string $logo = null)
+    {
+        $xml = $this->std->xml ?? null;
+        if (empty($xml)) {
+            throw new \Exception('Informe o XML da NFS-e em $std->xml para renderizar o DANFSe.');
+        }
+        $danfe = new Danfe($xml);
+        return $danfe->render($logo);
+    }
+
+    /*
+    * Consulta a NFSe pela chave de acesso
+    * @return string
+    */
     public function consultaNfseChave()
     {
         $callback = 'SefinNacional/nfse/' . $this->std->chave_acesso;
-        $response = $this->sender->request($callback, null, 'GET');
-        return $response;
+        return $this->sender->request($callback, null, 'GET');
     }
 
     public function consultaDpsChave()
     {
         $callback = 'SefinNacional/dps/' . $this->std->key;
-        $response = $this->sender->request($callback, null, 'GET');
-        return $response;
+        return $this->sender->request($callback, null, 'GET');
     }
 
     public function consultaNfseEventos()
@@ -91,8 +111,7 @@ class Nfse extends NfseAbstract implements NfseInterface
         if ($this->std->nsequence) {
             $callback .= '/' . $this->std->nsequence;
         }
-        $response = $this->sender->request($callback, null, 'GET');
-        return $response;
+        return $this->sender->request($callback, null, 'GET'); 
     }
 
     public function cancelarNfse()
@@ -109,8 +128,7 @@ class Nfse extends NfseAbstract implements NfseInterface
         ];
 
         $callback = 'SefinNacional/nfse/' . $this->std->infPedReg->chNFSe . '/eventos';
-        $response = $this->sender->request($callback, json_encode($dados));
-        return $response;
+        return $this->sender->request($callback, json_encode($dados));
     }
 
     public function nfseFile(string $response)

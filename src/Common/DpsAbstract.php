@@ -456,18 +456,22 @@ abstract class DpsAbstract{
                             true
                         );
                     }
-                    $this->dom->addChild(
-                        $end_inner,
-                        'xLgr',
-                        $this->std->inf->toma->end->xlgr,
-                        true
-                    );
-                    $this->dom->addChild(
-                        $end_inner,
-                        'nro',
-                        $this->std->inf->toma->end->nro,
-                        true
-                    );
+                    if (isset($this->std->inf->toma->end->xlgr)) {
+                        $this->dom->addChild(
+                            $end_inner,
+                            'xLgr',
+                            $this->std->inf->toma->end->xlgr,
+                            true
+                        );
+                    }
+                    if (isset($this->std->inf->toma->end->nro)) {
+                        $this->dom->addChild(
+                            $end_inner,
+                            'nro',
+                            $this->std->inf->toma->end->nro,
+                            true
+                        );
+                    }
                     if (isset($this->std->inf->toma->end->xcpl)) {
                         $this->dom->addChild(
                             $end_inner,
@@ -476,12 +480,14 @@ abstract class DpsAbstract{
                             false
                         );
                     }
-                    $this->dom->addChild(
-                        $end_inner,
-                        'xBairro',
-                        $this->std->inf->toma->end->xbairro,
-                        true
-                    );
+                    if (isset($this->std->inf->toma->end->xbairro)) {
+                        $this->dom->addChild(
+                            $end_inner,
+                            'xBairro',
+                            $this->std->inf->toma->end->xbairro,
+                            true
+                        );
+                    }
                 }
                 if (isset($this->std->inf->toma->fone)) {
                     $this->dom->addChild(

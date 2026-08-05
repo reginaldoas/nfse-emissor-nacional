@@ -107,7 +107,7 @@ class Sender{
 
         $url_api = "https://www.nfse.gov.br/EmissorNacional/Certificado";
 
-        $path = dirname(__DIR__).'/TESTES/novo_certificado.pfx';
+        // $path = dirname(__DIR__).'/TESTES/novo_certificado.pfx';
 
         // $fp = fopen(dirname(__FILE__).'/errorlog.txt', 'w');
 
